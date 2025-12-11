@@ -41,13 +41,10 @@
     <style>
       body { background-color: #1a1a1a; color: #d8cba8; }
       
-      /* Scrollbar Personalizada */
       ::-webkit-scrollbar { width: 8px; }
       ::-webkit-scrollbar-track { background: #2b2b2b; }
       ::-webkit-scrollbar-thumb { background: #8a0303; border-radius: 2px; }
-      ::-webkit-scrollbar-thumb:hover { background: #a30404; }
-
-      /* Efeitos Visuais */
+      
       .grunge-overlay {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;
         background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
@@ -60,23 +57,37 @@
         box-shadow: 8px 8px 15px rgba(0,0,0,0.5);
       }
 
-      /* Utilitários */
       input[type=number]::-webkit-inner-spin-button, 
       input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
       
       .dashed-box { border: 2px dashed rgba(43, 43, 43, 0.3); }
       
-      /* Animações dos Seletores */
       .icon-btn.selected { background-color: #2b2b2b; color: #d8cba8; transform: scale(1.1); border-color: #000; }
       .color-btn.selected { border-color: #000; transform: scale(1.2); box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
       
-      /* Botão de Gorjeta */
       .tip-btn.active {
         background-color: #2b2b2b;
         color: #d8cba8;
         border-color: #2b2b2b;
         box-shadow: 2px 2px 0px 0px rgba(138, 3, 3, 0.8);
         transform: translateY(-2px);
+      }
+
+      /* Classe utilitária para inputs de alta legibilidade */
+      .input-readable {
+        background-color: rgba(255, 255, 255, 0.4);
+        color: #000000;
+        font-weight: 700;
+        border: 2px solid rgba(43, 43, 43, 0.3);
+      }
+      .input-readable:focus {
+        border-color: #8a0303;
+        background-color: rgba(255, 255, 255, 0.6);
+        outline: none;
+      }
+      .input-readable::placeholder {
+        color: rgba(0, 0, 0, 0.5);
+        font-weight: normal;
       }
     </style>
 </head>
@@ -110,7 +121,6 @@
     <main class="container mx-auto px-4 py-8 max-w-7xl flex-grow flex flex-col lg:flex-row gap-8 relative z-10">
             
         <div class="lg:w-2/3 flex flex-col gap-6 h-full">
-            
             <div class="overflow-y-auto custom-scrollbar pr-2 flex-grow min-h-[400px]" id="productsGrid">
                 <div class="text-center py-20 opacity-30">
                     <i data-lucide="loader-2" class="w-10 h-10 animate-spin mx-auto mb-4"></i>
@@ -127,9 +137,7 @@
                 </div>
                 
                 <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-                    <div class="flex gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0" id="tipButtonsContainer">
-                        </div>
-
+                    <div class="flex gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0" id="tipButtonsContainer"></div>
                     <div class="flex-1 w-full relative">
                          <div class="absolute left-0 top-1/2 -translate-y-1/2 text-rdr-ink/50 pl-2">
                              <i data-lucide="dollar-sign" class="w-4 h-4"></i>
@@ -144,7 +152,7 @@
         </div>
 
         <div class="lg:w-1/3 h-auto lg:h-full sticky top-4 lg:static">
-            <div id="receiptArea" class="receipt-paper text-rdr-ink p-6 font-ledger text-sm relative min-h-[600px] flex flex-col border-4 border-double border-rdr-ink/80 transform rotate-1 transition-transform hover:rotate-0 duration-300">
+            <div id="receiptArea" class="receipt-paper text-rdr-ink p-6 font-ledger text-sm relative min-h-[600px] flex flex-col border-4 border-double border-rdr-ink/80">
                 
                 <div id="receiptWatermark" class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-10 hidden overflow-hidden z-0">
                     <img src="" class="w-3/4 object-contain grayscale sepia mix-blend-multiply filter blur-[0.5px]">
@@ -156,7 +164,7 @@
                             <img id="receiptLogo" src="" class="h-16 w-auto max-w-[80px] object-contain grayscale sepia hidden contrast-125">
                             <h2 id="receiptStoreTitle" class="font-western text-3xl uppercase tracking-widest leading-none break-words">THE GARRISON</h2>
                         </div>
-                        <p class="text-xs uppercase mt-1 font-typewriter tracking-widest">Saint Denis, Lemoyne - <span id="currentDate"></span></p>
+                        <p class="text-xs uppercase mt-1 font-typewriter tracking-widest" id="receiptAddressDate">Saint Denis, Lemoyne - 11/12/2025</p>
                     </div>
 
                     <div class="flex-grow overflow-y-auto custom-scrollbar pr-1 max-h-[50vh]" id="cartItems">
@@ -166,13 +174,11 @@
                     </div>
 
                     <div class="mt-auto border-t-2 border-dashed border-rdr-ink/50 pt-4 bg-rdr-paper/30 rounded-sm">
-                        
                         <div class="space-y-1 mb-4 px-2">
                             <div class="flex justify-between font-western text-lg text-rdr-ink/70">
                                 <span>PRODUTOS:</span>
                                 <span id="subtotalDisplay" class="font-typewriter font-bold text-rdr-ink">$0.00</span>
                             </div>
-                            
                             <div class="flex justify-between font-western text-lg text-rdr-ink/70 items-center">
                                 <span id="tipLabel">GORJETA:</span>
                                 <span id="tipDisplay" class="font-typewriter font-bold text-rdr-ink">$0.00</span>
@@ -219,10 +225,14 @@
                 <div class="absolute inset-0 pointer-events-none opacity-10 bg-[url('https://www.transparenttextures.com/patterns/aged-paper.png')] z-0"></div>
                 
                 <div id="content-general" class="space-y-8 relative z-10">
-                    
                     <div class="space-y-2">
                         <label class="font-western text-xl text-rdr-ink">Nome do Estabelecimento</label>
-                        <input type="text" id="confStoreName" class="w-full bg-transparent border-b-2 border-rdr-ink font-typewriter text-2xl p-2 outline-none focus:border-rdr-red placeholder-rdr-ink/30">
+                        <input type="text" id="confStoreName" class="w-full input-readable rounded p-2 font-typewriter text-xl shadow-sm">
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="font-western text-xl text-rdr-ink">Endereço / Localização</label>
+                        <input type="text" id="confStoreAddress" placeholder="Ex: Saint Denis, Lemoyne" class="w-full input-readable rounded p-2 font-typewriter text-lg shadow-sm">
                     </div>
 
                     <div class="pt-4 border-t border-dashed border-rdr-ink/30">
@@ -282,22 +292,20 @@
                 </div>
 
                 <div id="content-products" class="hidden space-y-8 relative z-10">
-                    
                     <div class="bg-rdr-paperDark/20 p-5 border border-rdr-ink/30 rounded shadow-inner space-y-5">
                         <h3 class="font-western text-xl opacity-80">Adicionar Novo Item</h3>
-                        
                         <div class="grid grid-cols-12 gap-3">
                             <div class="col-span-12 sm:col-span-5">
-                                <input type="text" id="newProdName" placeholder="Nome do Item" class="w-full p-2 bg-rdr-paper border border-rdr-ink/30 rounded font-typewriter outline-none focus:border-rdr-red shadow-sm">
+                                <input type="text" id="newProdName" placeholder="Nome do Item" class="w-full input-readable rounded p-2 font-typewriter shadow-sm">
                             </div>
                             <div class="col-span-6 sm:col-span-3">
                                 <div class="relative">
-                                    <span class="absolute left-2 top-1/2 -translate-y-1/2 font-typewriter opacity-50">$</span>
-                                    <input type="number" id="newProdPrice" placeholder="Preço" class="w-full p-2 pl-6 bg-rdr-paper border border-rdr-ink/30 rounded font-typewriter outline-none focus:border-rdr-red shadow-sm">
+                                    <span class="absolute left-2 top-1/2 -translate-y-1/2 font-typewriter opacity-50 z-10 text-black">$</span>
+                                    <input type="number" id="newProdPrice" placeholder="Preço" class="w-full input-readable rounded p-2 pl-6 font-typewriter shadow-sm">
                                 </div>
                             </div>
                             <div class="col-span-6 sm:col-span-4">
-                                <select id="newProdCat" class="w-full p-2 bg-rdr-paper border border-rdr-ink/30 rounded font-typewriter outline-none h-full shadow-sm cursor-pointer">
+                                <select id="newProdCat" class="w-full input-readable rounded p-2 font-typewriter h-full shadow-sm cursor-pointer">
                                     <option value="Bebidas">Bebidas</option>
                                     <option value="Comida">Comida</option>
                                     <option value="Suprimentos">Suprimentos</option>
@@ -307,14 +315,12 @@
 
                         <div class="dashed-box p-3 rounded bg-rdr-paper/50">
                             <label class="text-xs font-western opacity-60 uppercase mb-2 block tracking-widest">Escolha o Ícone</label>
-                            <div class="flex flex-wrap gap-3" id="iconPickerGrid">
-                                </div>
+                            <div class="flex flex-wrap gap-3" id="iconPickerGrid"></div>
                         </div>
 
                         <div class="dashed-box p-3 rounded bg-rdr-paper/50">
                             <label class="text-xs font-western opacity-60 uppercase mb-2 block tracking-widest">Cor do Ícone</label>
-                            <div class="flex gap-3 flex-wrap" id="colorPickerGrid">
-                                </div>
+                            <div class="flex gap-3 flex-wrap" id="colorPickerGrid"></div>
                         </div>
 
                         <button onclick="addProduct()" class="w-full bg-rdr-ink text-rdr-paper py-3 font-western uppercase rounded hover:bg-black transition-all flex items-center justify-center gap-2 text-lg shadow-md active:translate-y-0.5">
@@ -322,8 +328,7 @@
                         </button>
                     </div>
 
-                    <div class="space-y-3 pb-4" id="confProductList">
-                        </div>
+                    <div class="space-y-3 pb-4" id="confProductList"></div>
                 </div>
             </div>
 
@@ -337,25 +342,8 @@
     </div>
 
     <script>
-        // === CONSTANTS ===
-        // Mapped to match exactly the screenshot order and logic
-        const ICONS_MAP = [
-            'beer', 'glass-water', 'coffee', 'wine-off', // Bebidas
-            'utensils-crossed', 'drumstick', 'carrot', 'apple', 'fish', 'wheat', // Comida
-            'cigarette', 'shopping-bag', 'skull', 'star', 'heart', 'flame', 'shield', 'gem' // Suprimentos/Outros
-        ];
-        
-        const COLORS_MAP = [
-            '#2b2b2b', // Black (Default)
-            '#8a0303', // Red
-            '#d97706', // Amber
-            '#ea580c', // Orange
-            '#15803d', // Green
-            '#1d4ed8', // Blue
-            '#78350f', // Brown
-            '#6b7280'  // Gray
-        ];
-
+        const ICONS_MAP = ['beer', 'glass-water', 'coffee', 'wine-off', 'utensils-crossed', 'drumstick', 'carrot', 'apple', 'fish', 'wheat', 'cigarette', 'shopping-bag', 'skull', 'star', 'heart', 'flame', 'shield', 'gem'];
+        const COLORS_MAP = ['#2b2b2b', '#8a0303', '#d97706', '#ea580c', '#15803d', '#1d4ed8', '#78350f', '#6b7280'];
         const QUOTES = [
             "Se a vida te der limões, faça uma caipirinha.",
             "Teu galeto prefere o nosso espeto.",
@@ -367,8 +355,8 @@
         ];
 
         const DEFAULT_STORE_NAME = "The Garrison";
+        const DEFAULT_STORE_ADDRESS = "Saint Denis, Lemoyne";
         
-        // Initial Products exactly as per previous context
         const DEFAULT_PRODUCTS = [
             { id: '1', name: 'Moonshine', price: 0.55, category: 'Bebidas', icon: 'beer', color: '#d97706' },
             { id: '2', name: 'Água da bica', price: 0.00, category: 'Bebidas', icon: 'glass-water', color: '#1d4ed8' },
@@ -378,50 +366,43 @@
             { id: '6', name: 'Charuto Cubano', price: 0.75, category: 'Suprimentos', icon: 'cigarette', color: '#78350f' }
         ];
 
-        // === STATE ===
         let state = {
             storeName: DEFAULT_STORE_NAME,
+            storeAddress: DEFAULT_STORE_ADDRESS,
             products: JSON.parse(JSON.stringify(DEFAULT_PRODUCTS)),
-            cart: {}, // { id: quantity }
+            cart: {}, 
             logo: null,
             showHeader: false,
             showWatermark: false,
-            tipMode: 'percent', // 'percent' | 'fixed'
-            tipValue: 0 // Default 0
+            tipMode: 'percent', 
+            tipValue: 0
         };
 
-        // Temporary state for the Settings Modal
         let tempIcon = 'utensils-crossed';
         let tempColor = '#2b2b2b';
 
-        // === INIT ===
         function init() {
-            // Load from LocalStorage
-            const saved = localStorage.getItem('saloon_ledger_v3');
+            const saved = localStorage.getItem('saloon_ledger_v5');
             if (saved) {
                 try {
                     const parsed = JSON.parse(saved);
                     state = { ...state, ...parsed };
+                    if(!state.storeAddress) state.storeAddress = DEFAULT_STORE_ADDRESS;
                 } catch(e) { console.error("Save corrupted", e); }
             }
 
-            // Set dynamic date
-            document.getElementById('currentDate').innerText = new Date().toLocaleDateString('pt-BR');
+            document.getElementById('receiptAddressDate').innerText = `${state.storeAddress} - ${new Date().toLocaleDateString('pt-BR')}`;
             document.getElementById('quoteDisplay').innerText = QUOTES[Math.floor(Math.random() * QUOTES.length)];
 
-            // Initial Renders
             setupPickers();
             renderAll();
         }
 
-        // === RENDER ENGINE ===
         function renderAll() {
             renderHeader();
             renderProducts();
             renderTipControls();
             renderReceipt();
-            
-            // Re-initialize icons
             lucide.createIcons();
         }
 
@@ -448,28 +429,21 @@
                 const prods = state.products.filter(p => p.category === cat);
                 if (prods.length === 0) return;
 
-                // Category Header
                 const catHeader = document.createElement('h3');
                 catHeader.className = "font-western text-xl text-rdr-paper/60 border-b-2 border-rdr-paper/10 mb-4 mt-6 pb-1 uppercase tracking-widest flex items-center gap-2 select-none";
                 catHeader.innerHTML = `<i data-lucide="${iconsMap[cat] || 'package'}" class="w-5 h-5"></i> ${cat}`;
                 grid.appendChild(catHeader);
 
-                // Grid Container
                 const divGrid = document.createElement('div');
                 divGrid.className = "grid grid-cols-1 md:grid-cols-2 gap-4";
                 
                 prods.forEach(p => {
                     const qty = state.cart[p.id] || 0;
                     const isSelected = qty > 0;
-                    
                     const card = document.createElement('div');
-                    // Style matching ProductCard.tsx + visual improvements
                     card.className = `relative p-4 border-2 transition-all duration-200 cursor-pointer select-none rounded group overflow-hidden ${isSelected ? 'bg-rdr-paper border-rdr-red transform -translate-y-1 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.5)]' : 'bg-rdr-paper/90 border-rdr-ink/40 hover:border-rdr-red/60 shadow-sm'}`;
-                    
-                    // Click entire card to increment
                     card.onclick = () => updateCart(p.id, 1);
 
-                    // Corner Accents (Decorations)
                     const corners = `
                         <div class="absolute top-1 left-1 w-2 h-2 border-t-2 border-l-2 border-rdr-ink/20"></div>
                         <div class="absolute top-1 right-1 w-2 h-2 border-t-2 border-r-2 border-rdr-ink/20"></div>
@@ -485,18 +459,12 @@
                            </div>
                            <h3 class="font-western text-lg leading-none text-rdr-ink tracking-wide pt-1">${p.name}</h3>
                         </div>
-                        
                         <div class="flex justify-between items-end relative z-10">
                             <span class="font-typewriter font-bold text-rdr-red text-lg">$${p.price.toFixed(2)}</span>
-                            
                             <div class="flex items-center space-x-1 bg-rdr-paperDark p-1 rounded border border-rdr-ink/20 shadow-inner" onclick="event.stopPropagation()">
-                                <button onclick="updateCart('${p.id}', -1)" class="w-8 h-8 flex items-center justify-center bg-rdr-red text-white rounded-sm hover:bg-red-900 border border-black shadow-sm disabled:opacity-50 transition-colors" ${qty === 0 ? 'disabled' : ''}>
-                                    <i data-lucide="minus" class="w-4 h-4"></i>
-                                </button>
+                                <button onclick="updateCart('${p.id}', -1)" class="w-8 h-8 flex items-center justify-center bg-rdr-red text-white rounded-sm hover:bg-red-900 border border-black shadow-sm disabled:opacity-50 transition-colors" ${qty === 0 ? 'disabled' : ''}><i data-lucide="minus" class="w-4 h-4"></i></button>
                                 <span class="font-typewriter text-xl font-bold w-10 text-center text-rdr-ink">${qty > 0 ? qty : ''}</span>
-                                <button onclick="updateCart('${p.id}', 1)" class="w-8 h-8 flex items-center justify-center bg-rdr-dark text-white rounded-sm hover:bg-black border border-black shadow-sm transition-colors">
-                                    <i data-lucide="plus" class="w-4 h-4"></i>
-                                </button>
+                                <button onclick="updateCart('${p.id}', 1)" class="w-8 h-8 flex items-center justify-center bg-rdr-dark text-white rounded-sm hover:bg-black border border-black shadow-sm transition-colors"><i data-lucide="plus" class="w-4 h-4"></i></button>
                             </div>
                         </div>
                     `;
@@ -509,27 +477,16 @@
         function renderTipControls() {
             const container = document.getElementById('tipButtonsContainer');
             container.innerHTML = '';
-            
-            // Exact percentages from the screenshot
             const percentages = [0, 5, 10, 15, 20];
-            
             percentages.forEach(pct => {
                 const isActive = state.tipMode === 'percent' && state.tipValue === pct;
-                
                 const btn = document.createElement('button');
                 btn.className = `tip-btn min-w-[3.5rem] py-2 px-1 font-typewriter font-bold border-2 border-rdr-ink/40 text-rdr-ink/70 rounded transition-all duration-200 ${isActive ? 'active' : 'hover:bg-rdr-paperDark hover:text-rdr-red hover:border-rdr-red'}`;
                 btn.innerHTML = pct === 0 ? 'X' : `${pct}%`;
-                
-                btn.onclick = () => { 
-                    state.tipMode = 'percent'; 
-                    state.tipValue = pct; 
-                    renderAll(); 
-                };
-                
+                btn.onclick = () => { state.tipMode = 'percent'; state.tipValue = pct; renderAll(); };
                 container.appendChild(btn);
             });
 
-            // Update fixed input visual state
             const fixedInput = document.getElementById('fixedTipInput');
             if (state.tipMode === 'fixed') {
                 fixedInput.value = state.tipValue > 0 ? state.tipValue : '';
@@ -545,20 +502,19 @@
         function setFixedTip(val) {
             state.tipMode = 'fixed';
             state.tipValue = parseFloat(val) || 0;
-            // Deselect percent buttons visually handled by re-render
             renderAll();
         }
 
         function renderReceipt() {
-            // UI References
             const subtotalEl = document.getElementById('subtotalDisplay');
             const tipDisplayEl = document.getElementById('tipDisplay');
             const tipLabelEl = document.getElementById('tipLabel');
             const totalEl = document.getElementById('totalDisplay');
             const container = document.getElementById('cartItems');
 
-            // Header Elements
             document.getElementById('receiptStoreTitle').innerText = state.storeName;
+            document.getElementById('receiptAddressDate').innerText = `${state.storeAddress} - ${new Date().toLocaleDateString('pt-BR')}`;
+            
             const receiptLogo = document.getElementById('receiptLogo');
             const watermark = document.getElementById('receiptWatermark');
 
@@ -572,17 +528,10 @@
                 watermark.classList.remove('hidden');
             } else watermark.classList.add('hidden');
 
-            // Calculation
             let subtotal = 0;
             let html = `
                 <table class="w-full text-left font-typewriter text-sm">
-                    <thead>
-                        <tr class="border-b border-rdr-ink/30 text-rdr-ink/50 text-xs">
-                            <th class="pb-1 w-10">QNT</th>
-                            <th class="pb-1">ITEM</th>
-                            <th class="pb-1 text-right">VALOR</th>
-                        </tr>
-                    </thead>
+                    <thead><tr class="border-b border-rdr-ink/30 text-rdr-ink/50 text-xs"><th class="pb-1 w-10">QNT</th><th class="pb-1">ITEM</th><th class="pb-1 text-right">VALOR</th></tr></thead>
                     <tbody class="divide-y divide-rdr-ink/10">
             `;
             
@@ -594,39 +543,20 @@
                     if (prod) {
                         const total = prod.price * qty;
                         subtotal += total;
-                        html += `
-                            <tr class="group hover:bg-rdr-ink/5">
-                                <td class="py-2 font-bold align-top">${qty}x</td>
-                                <td class="py-2 uppercase align-top leading-tight">${prod.name}</td>
-                                <td class="py-2 text-right align-top whitespace-nowrap">$${total.toFixed(2)}</td>
-                            </tr>
-                        `;
+                        html += `<tr class="group hover:bg-rdr-ink/5"><td class="py-2 font-bold align-top">${qty}x</td><td class="py-2 uppercase align-top leading-tight">${prod.name}</td><td class="py-2 text-right align-top whitespace-nowrap">$${total.toFixed(2)}</td></tr>`;
                     }
                 }
             });
             html += '</tbody></table>';
 
             if (!hasItems) {
-                container.innerHTML = `
-                    <div class="flex flex-col items-center justify-center h-40 text-rdr-ink/40 italic">
-                        <i data-lucide="scroll" class="w-8 h-8 mb-2 opacity-50"></i>
-                        <span>Nenhum pedido anotado...</span>
-                    </div>
-                `;
+                container.innerHTML = `<div class="flex flex-col items-center justify-center h-40 text-rdr-ink/40 italic"><i data-lucide="scroll" class="w-8 h-8 mb-2 opacity-50"></i><span>Nenhum pedido anotado...</span></div>`;
             } else {
                 container.innerHTML = html;
             }
 
-            // Totals
-            let tipAmount = 0;
-            if (state.tipMode === 'percent') {
-                tipAmount = subtotal * (state.tipValue / 100);
-                tipLabelEl.innerText = `GORJETA (${state.tipValue}%):`;
-            } else {
-                tipAmount = state.tipValue;
-                tipLabelEl.innerText = `GORJETA (EXTRA):`;
-            }
-
+            let tipAmount = state.tipMode === 'percent' ? subtotal * (state.tipValue / 100) : state.tipValue;
+            tipLabelEl.innerText = state.tipMode === 'percent' ? `GORJETA (${state.tipValue}%):` : 'GORJETA (EXTRA):';
             const finalTotal = subtotal + tipAmount;
 
             subtotalEl.innerText = `$${subtotal.toFixed(2)}`;
@@ -634,18 +564,16 @@
             totalEl.innerText = `$${finalTotal.toFixed(2)}`;
         }
 
-        // === ACTIONS ===
         function updateCart(id, change) {
             if (!state.cart[id]) state.cart[id] = 0;
             state.cart[id] += change;
             if (state.cart[id] < 0) state.cart[id] = 0;
-            saveState(); // Auto-save on change
+            saveState();
             renderAll();
         }
 
         function clearCart() {
             if(Object.keys(state.cart).length > 0) {
-                 // Simple animation
                  const paper = document.getElementById('receiptArea');
                  paper.style.transform = 'scale(0.9) rotate(5deg)';
                  setTimeout(() => {
@@ -654,63 +582,44 @@
                      state.tipValue = 0;
                      saveState();
                      renderAll();
-                     paper.style.transform = ''; // reset
+                     paper.style.transform = ''; 
                  }, 200);
             }
         }
 
         function downloadReceipt() {
             const element = document.getElementById('receiptArea');
-            // Slight visual tweak for print
-            element.style.transform = 'none';
-            element.style.borderRadius = '0';
-            
-            html2canvas(element, {
-                scale: 2, // High res
-                backgroundColor: '#d8cba8', // Enforce paper color
-                useCORS: true,
-                ignoreElements: (el) => el.getAttribute('data-html2canvas-ignore') === 'true'
-            }).then(canvas => {
+            html2canvas(element, { scale: 2, backgroundColor: '#d8cba8', useCORS: true, ignoreElements: (el) => el.getAttribute('data-html2canvas-ignore') === 'true' })
+            .then(canvas => {
                 const link = document.createElement('a');
                 const safeName = state.storeName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
                 link.download = `${safeName}_recibo_${Date.now()}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
-                
-                // Reset visual
-                element.style.borderRadius = ''; 
-                element.style.transform = ''; 
-            }).catch(err => {
-                alert("Erro ao gerar imagem: " + err);
-            });
+            }).catch(err => alert("Erro ao gerar imagem: " + err));
         }
 
         function saveState() {
-            localStorage.setItem('saloon_ledger_v3', JSON.stringify(state));
+            localStorage.setItem('saloon_ledger_v5', JSON.stringify(state));
         }
 
-        // === SETTINGS MODAL LOGIC ===
         function toggleSettings() {
             const modal = document.getElementById('settingsModal');
             const content = document.getElementById('settingsModalContent');
             const isHidden = modal.classList.contains('hidden');
             
             if (isHidden) {
-                // Open
                 modal.classList.remove('hidden');
-                // Small delay to allow display block to render before opacity transition
                 requestAnimationFrame(() => {
                     modal.classList.remove('opacity-0', 'pointer-events-none');
                     content.classList.remove('scale-95');
                     content.classList.add('scale-100');
                 });
-
-                // Populate Fields
                 document.getElementById('confStoreName').value = state.storeName;
+                document.getElementById('confStoreAddress').value = state.storeAddress;
                 document.getElementById('confShowHeader').checked = state.showHeader;
                 document.getElementById('confShowWatermark').checked = state.showWatermark;
                 document.getElementById('prodCount').innerText = state.products.length;
-                
                 if(state.logo) {
                     document.getElementById('confLogoPreview').src = state.logo;
                     document.getElementById('confLogoPreview').classList.remove('hidden');
@@ -719,11 +628,9 @@
                     document.getElementById('confLogoPreview').classList.add('hidden');
                     document.getElementById('confLogoPlaceholder').classList.remove('hidden');
                 }
-
-                switchTab('general'); // Default tab
+                switchTab('general');
                 renderConfProductList();
             } else {
-                // Close
                 modal.classList.add('opacity-0', 'pointer-events-none');
                 content.classList.remove('scale-100');
                 content.classList.add('scale-95');
@@ -732,11 +639,9 @@
         }
 
         function switchTab(tabName) {
-            // Reset Styles
             ['general', 'products'].forEach(t => {
                 const btn = document.getElementById(`tab-${t}`);
                 const div = document.getElementById(`content-${t}`);
-                
                 if (t === tabName) {
                     btn.classList.add('bg-rdr-paper', 'text-rdr-ink', 'border-r-2', 'border-l-2', 'border-t-2', 'border-b-0', 'border-rdr-ink/20', 'font-bold');
                     btn.classList.remove('text-rdr-ink/50', 'hover:bg-rdr-paper/50');
@@ -749,32 +654,25 @@
             });
         }
 
-        // --- PICKERS SETUP ---
         function setupPickers() {
             const iconGrid = document.getElementById('iconPickerGrid');
             iconGrid.innerHTML = '';
-            
             ICONS_MAP.forEach(icon => {
                 const btn = document.createElement('button');
                 btn.className = "icon-btn w-10 h-10 flex items-center justify-center rounded border border-transparent hover:bg-black/10 transition-all text-rdr-ink";
                 btn.innerHTML = `<i data-lucide="${icon}" class="w-5 h-5"></i>`;
                 btn.onclick = () => selectIcon(btn, icon);
-                
-                if(icon === tempIcon) {
-                    btn.classList.add('selected');
-                }
+                if(icon === tempIcon) btn.classList.add('selected');
                 iconGrid.appendChild(btn);
             });
 
             const colorGrid = document.getElementById('colorPickerGrid');
             colorGrid.innerHTML = '';
-
             COLORS_MAP.forEach(color => {
                 const btn = document.createElement('button');
                 btn.className = "color-btn w-8 h-8 rounded-full border-2 border-transparent transition-all";
                 btn.style.backgroundColor = color;
                 btn.onclick = () => selectColor(btn, color);
-                
                 if(color === tempColor) {
                     btn.classList.add('selected');
                     btn.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-white mx-auto"></i>';
@@ -801,29 +699,18 @@
             lucide.createIcons();
         }
 
-        // --- PRODUCT MANAGEMENT ---
         function addProduct() {
             const name = document.getElementById('newProdName').value;
             const price = parseFloat(document.getElementById('newProdPrice').value);
             const cat = document.getElementById('newProdCat').value;
             
             if (name && !isNaN(price)) {
-                state.products.push({ 
-                    id: `custom_${Date.now()}`, 
-                    name, 
-                    price, 
-                    category: cat, 
-                    icon: tempIcon, 
-                    color: tempColor 
-                });
-                
-                // Clear Inputs
+                state.products.push({ id: `custom_${Date.now()}`, name, price, category: cat, icon: tempIcon, color: tempColor });
                 document.getElementById('newProdName').value = '';
                 document.getElementById('newProdPrice').value = '';
-                
                 document.getElementById('prodCount').innerText = state.products.length;
                 renderConfProductList();
-                renderAll(); // Updates background grid instantly
+                renderAll(); 
             } else {
                 alert("Preencha o nome e o preço corretamente.");
             }
@@ -832,7 +719,6 @@
         function renderConfProductList() {
             const list = document.getElementById('confProductList');
             list.innerHTML = '';
-            
             if (state.products.length === 0) {
                 list.innerHTML = '<p class="text-center text-rdr-ink/50 py-4 font-typewriter">Nenhum produto cadastrado.</p>';
                 return;
@@ -842,17 +728,10 @@
                 const item = document.createElement('div');
                 item.className = "flex items-center gap-3 p-3 bg-white/40 rounded border border-rdr-ink/10 hover:bg-white/60 transition-colors";
                 item.innerHTML = `
-                    <div class="p-2 rounded-full bg-rdr-paperDark border border-rdr-ink/10">
-                        <i data-lucide="${p.icon || 'package'}" style="color:${p.color || '#000'}" class="w-4 h-4"></i>
-                    </div>
-                    <div class="flex-1 font-typewriter">
-                        <div class="font-bold text-rdr-ink">${p.name}</div>
-                        <div class="text-xs opacity-60 uppercase">${p.category}</div>
-                    </div>
+                    <div class="p-2 rounded-full bg-rdr-paperDark border border-rdr-ink/10"><i data-lucide="${p.icon || 'package'}" style="color:${p.color || '#000'}" class="w-4 h-4"></i></div>
+                    <div class="flex-1 font-typewriter"><div class="font-bold text-black">${p.name}</div><div class="text-xs opacity-60 uppercase">${p.category}</div></div>
                     <div class="font-bold text-rdr-red font-typewriter text-lg">$${p.price.toFixed(2)}</div>
-                    <button onclick="removeProduct(${index})" class="p-2 text-rdr-ink/40 hover:text-rdr-red hover:bg-red-100 rounded transition-colors" title="Excluir">
-                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                    </button>
+                    <button onclick="removeProduct(${index})" class="p-2 text-rdr-ink/40 hover:text-rdr-red hover:bg-red-100 rounded transition-colors" title="Excluir"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                 `;
                 list.appendChild(item);
             });
@@ -863,16 +742,13 @@
             if(confirm('Remover este item do catálogo?')) {
                 const prodId = state.products[index].id;
                 state.products.splice(index, 1);
-                // Remove from cart if exists
                 if(state.cart[prodId]) delete state.cart[prodId];
-                
                 document.getElementById('prodCount').innerText = state.products.length;
                 renderConfProductList();
                 renderAll();
             }
         }
 
-        // --- LOGO HANDLING ---
         function handleLogoUpload(input) {
             const file = input.files[0];
             if (file) {
@@ -894,7 +770,6 @@
             document.getElementById('logoInput').value = "";
         }
 
-        // --- IMPORT / EXPORT / RESET ---
         function exportSettings() {
             const blob = new Blob([JSON.stringify(state, null, 2)], {type: 'application/json'});
             const url = URL.createObjectURL(blob);
@@ -924,32 +799,29 @@
                         alert("Backup restaurado com sucesso!");
                     }
                 } catch(err) { alert("Arquivo inválido!"); }
-                input.value = ''; // reset
+                input.value = ''; 
             }
             reader.readAsText(file);
         }
 
         function resetFactory() {
             if(confirm("ATENÇÃO: Isso apagará todos os produtos personalizados e configurações. Voltar ao padrão?")) {
-                localStorage.removeItem('saloon_ledger_v3');
+                localStorage.removeItem('saloon_ledger_v5');
                 location.reload();
             }
         }
         
-        // --- FINAL SAVE ---
         function saveSettings() {
             state.storeName = document.getElementById('confStoreName').value;
+            state.storeAddress = document.getElementById('confStoreAddress').value;
             state.showHeader = document.getElementById('confShowHeader').checked;
             state.showWatermark = document.getElementById('confShowWatermark').checked;
-            
             saveState();
             toggleSettings();
             renderAll();
         }
 
-        // Start
         init();
-
     </script>
 </body>
 </html>
