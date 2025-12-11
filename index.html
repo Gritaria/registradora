@@ -6,9 +6,7 @@
     <title>The Garrison - Caixa Registradora</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <script src="https://unpkg.com/lucide@latest"></script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -99,7 +97,15 @@
         <div class="container mx-auto px-4 flex justify-between items-center">
             <div class="flex items-center space-x-4">
                 <div class="h-16 w-16 rounded-full border-2 border-white/30 bg-black/20 flex items-center justify-center overflow-hidden shrink-0 shadow-inner hidden sm:flex transition-all" id="headerLogoContainer">
-                   <i data-lucide="saloon-doors" class="w-9 h-9 text-yellow-500/90"></i> 
+                   <!-- Custom SVG Saloon Doors -->
+                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-9 h-9 text-yellow-500/90">
+                      <path d="M3 7h8v10H3z" />
+                      <path d="M13 7h8v10h-8z" />
+                      <path d="M5 10h4" />
+                      <path d="M5 14h4" />
+                      <path d="M15 10h4" />
+                      <path d="M15 14h4" />
+                   </svg>
                 </div>
                 <div>
                     <h1 id="headerStoreName" class="font-western text-3xl md:text-5xl tracking-widest drop-shadow-md">The Garrison</h1>
@@ -164,7 +170,7 @@
                             <img id="receiptLogo" src="" class="h-16 w-auto max-w-[80px] object-contain grayscale sepia hidden contrast-125">
                             <h2 id="receiptStoreTitle" class="font-western text-3xl uppercase tracking-widest leading-none break-words">THE GARRISON</h2>
                         </div>
-                        <p class="text-xs uppercase mt-1 font-typewriter tracking-widest" id="receiptAddressDate">Saint Denis, Lemoyne - 11/12/2025</p>
+                        <p class="text-xs uppercase mt-1 font-typewriter tracking-widest" id="receiptAddressDate">Saint Denis, Lemoyne</p>
                     </div>
 
                     <div class="flex-grow overflow-y-auto custom-scrollbar pr-1 max-h-[50vh]" id="cartItems">
@@ -208,7 +214,8 @@
         </div>
     </main>
 
-    <div id="settingsModal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity opacity-0 pointer-events-none">
+    <!-- SETTINGS MODAL -->
+    <div id="settingsModal" class="fixed inset-0 bg-black/80 z-40 hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity opacity-0 pointer-events-none">
         <div class="bg-rdr-paper w-full max-w-2xl h-[90vh] max-h-[800px] flex flex-col rounded shadow-2xl border-4 border-rdr-ink relative overflow-hidden transform scale-95 transition-transform" id="settingsModalContent">
             
             <div class="bg-rdr-red p-4 flex justify-between items-center text-white border-b-4 border-black shrink-0">
@@ -341,6 +348,22 @@
         </div>
     </div>
 
+    <!-- GENERIC MESSAGE DIALOG (Replaces alert/confirm) -->
+    <div id="genericModal" class="fixed inset-0 bg-black/90 z-[60] hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity opacity-0 pointer-events-none">
+        <div class="bg-rdr-paper w-full max-w-md flex flex-col rounded shadow-2xl border-4 border-rdr-ink relative overflow-hidden transform scale-95 transition-transform" id="genericModalContent">
+            <div class="bg-rdr-red p-3 flex justify-between items-center text-white border-b-4 border-black shrink-0">
+                <h2 id="genericModalTitle" class="font-western text-xl tracking-widest">ATENÇÃO</h2>
+                <button onclick="closeGenericModal()" class="hover:text-yellow-400 transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="p-6 text-center space-y-4">
+                <p id="genericModalMessage" class="font-typewriter text-lg text-rdr-ink"></p>
+                <div class="flex justify-center gap-3 mt-4" id="genericModalButtons">
+                    <!-- Buttons injected by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         const ICONS_MAP = ['beer', 'glass-water', 'coffee', 'wine-off', 'utensils-crossed', 'drumstick', 'carrot', 'apple', 'fish', 'wheat', 'cigarette', 'shopping-bag', 'skull', 'star', 'heart', 'flame', 'shield', 'gem'];
         const COLORS_MAP = ['#2b2b2b', '#8a0303', '#d97706', '#ea580c', '#15803d', '#1d4ed8', '#78350f', '#6b7280'];
@@ -381,6 +404,63 @@
         let tempIcon = 'utensils-crossed';
         let tempColor = '#2b2b2b';
 
+        // --- Generic Dialog Logic ---
+        function showDialog({ title, message, type = 'alert', onConfirm }) {
+            const modal = document.getElementById('genericModal');
+            const content = document.getElementById('genericModalContent');
+            const titleEl = document.getElementById('genericModalTitle');
+            const msgEl = document.getElementById('genericModalMessage');
+            const btnContainer = document.getElementById('genericModalButtons');
+
+            titleEl.innerText = title || (type === 'confirm' ? 'CONFIRMAÇÃO' : 'AVISO');
+            msgEl.innerText = message;
+            btnContainer.innerHTML = '';
+
+            if (type === 'confirm') {
+                const cancelBtn = document.createElement('button');
+                cancelBtn.className = "px-4 py-2 font-western text-rdr-ink border-2 border-transparent hover:border-rdr-ink/20 rounded transition-colors uppercase";
+                cancelBtn.innerText = "Cancelar";
+                cancelBtn.onclick = closeGenericModal;
+                btnContainer.appendChild(cancelBtn);
+
+                const confirmBtn = document.createElement('button');
+                confirmBtn.className = "bg-rdr-ink text-rdr-paper px-6 py-2 font-western uppercase rounded shadow-lg hover:bg-black border-2 border-black transition-transform hover:scale-105";
+                confirmBtn.innerText = "Confirmar";
+                confirmBtn.onclick = () => {
+                    if (onConfirm) onConfirm();
+                    closeGenericModal();
+                };
+                btnContainer.appendChild(confirmBtn);
+            } else {
+                const okBtn = document.createElement('button');
+                okBtn.className = "bg-rdr-ink text-rdr-paper px-6 py-2 font-western uppercase rounded shadow-lg hover:bg-black border-2 border-black transition-transform hover:scale-105";
+                okBtn.innerText = "Entendido";
+                okBtn.onclick = closeGenericModal;
+                btnContainer.appendChild(okBtn);
+            }
+
+            modal.classList.remove('hidden');
+            // Force reflow
+            void modal.offsetWidth;
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            content.classList.remove('scale-95');
+            content.classList.add('scale-100');
+        }
+
+        function closeGenericModal() {
+            const modal = document.getElementById('genericModal');
+            const content = document.getElementById('genericModalContent');
+            
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+        // -----------------------------
+
         function init() {
             const saved = localStorage.getItem('saloon_ledger_v5');
             if (saved) {
@@ -391,7 +471,8 @@
                 } catch(e) { console.error("Save corrupted", e); }
             }
 
-            document.getElementById('receiptAddressDate').innerText = `${state.storeAddress} - ${new Date().toLocaleDateString('pt-BR')}`;
+            // REMOVED DATE FROM HERE
+            document.getElementById('receiptAddressDate').innerText = state.storeAddress;
             document.getElementById('quoteDisplay').innerText = QUOTES[Math.floor(Math.random() * QUOTES.length)];
 
             setupPickers();
@@ -403,7 +484,9 @@
             renderProducts();
             renderTipControls();
             renderReceipt();
-            lucide.createIcons();
+            if (window.lucide) {
+                lucide.createIcons();
+            }
         }
 
         function renderHeader() {
@@ -414,7 +497,16 @@
                 logoContainer.innerHTML = `<img src="${state.logo}" class="w-full h-full object-cover grayscale sepia contrast-125">`;
                 logoContainer.classList.remove('hidden');
             } else {
-                logoContainer.innerHTML = `<i data-lucide="saloon-doors" class="w-9 h-9 text-yellow-500/90"></i>`;
+                // Replaced fallback icon with SVG saloon doors here too
+                logoContainer.innerHTML = `
+                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-9 h-9 text-yellow-500/90">
+                      <path d="M3 7h8v10H3z" />
+                      <path d="M13 7h8v10h-8z" />
+                      <path d="M5 10h4" />
+                      <path d="M5 14h4" />
+                      <path d="M15 10h4" />
+                      <path d="M15 14h4" />
+                   </svg>`;
             }
         }
 
@@ -513,7 +605,8 @@
             const container = document.getElementById('cartItems');
 
             document.getElementById('receiptStoreTitle').innerText = state.storeName;
-            document.getElementById('receiptAddressDate').innerText = `${state.storeAddress} - ${new Date().toLocaleDateString('pt-BR')}`;
+            // REMOVED DATE FROM HERE TOO
+            document.getElementById('receiptAddressDate').innerText = state.storeAddress;
             
             const receiptLogo = document.getElementById('receiptLogo');
             const watermark = document.getElementById('receiptWatermark');
@@ -596,7 +689,7 @@
                 link.download = `${safeName}_recibo_${Date.now()}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
-            }).catch(err => alert("Erro ao gerar imagem: " + err));
+            }).catch(err => showDialog({ title: 'Erro', message: "Erro ao gerar imagem: " + err }));
         }
 
         function saveState() {
@@ -685,7 +778,7 @@
             tempIcon = icon;
             document.querySelectorAll('.icon-btn').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
-            lucide.createIcons();
+            if(window.lucide) lucide.createIcons();
         }
 
         function selectColor(btn, color) {
@@ -696,7 +789,7 @@
             });
             btn.classList.add('selected');
             btn.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-white mx-auto"></i>';
-            lucide.createIcons();
+            if(window.lucide) lucide.createIcons();
         }
 
         function addProduct() {
@@ -712,7 +805,7 @@
                 renderConfProductList();
                 renderAll(); 
             } else {
-                alert("Preencha o nome e o preço corretamente.");
+                showDialog({ title: 'Erro', message: "Preencha o nome e o preço corretamente." });
             }
         }
 
@@ -735,18 +828,23 @@
                 `;
                 list.appendChild(item);
             });
-            lucide.createIcons();
+            if(window.lucide) lucide.createIcons();
         }
 
         function removeProduct(index) {
-            if(confirm('Remover este item do catálogo?')) {
-                const prodId = state.products[index].id;
-                state.products.splice(index, 1);
-                if(state.cart[prodId]) delete state.cart[prodId];
-                document.getElementById('prodCount').innerText = state.products.length;
-                renderConfProductList();
-                renderAll();
-            }
+            showDialog({
+                type: 'confirm',
+                title: 'Remover Item',
+                message: 'Remover este item do catálogo?',
+                onConfirm: () => {
+                     const prodId = state.products[index].id;
+                     state.products.splice(index, 1);
+                     if(state.cart[prodId]) delete state.cart[prodId];
+                     document.getElementById('prodCount').innerText = state.products.length;
+                     renderConfProductList();
+                     renderAll();
+                }
+            });
         }
 
         function handleLogoUpload(input) {
@@ -791,24 +889,34 @@
             reader.onload = (e) => {
                 try {
                     const data = JSON.parse(e.target.result);
-                    if (confirm("Isso substituirá suas configurações atuais. Continuar?")) {
-                        state = { ...state, ...data };
-                        saveState();
-                        toggleSettings();
-                        renderAll();
-                        alert("Backup restaurado com sucesso!");
-                    }
-                } catch(err) { alert("Arquivo inválido!"); }
+                    showDialog({
+                        type: 'confirm',
+                        title: 'Restaurar Backup',
+                        message: "Isso substituirá suas configurações atuais. Continuar?",
+                        onConfirm: () => {
+                             state = { ...state, ...data };
+                             saveState();
+                             toggleSettings();
+                             renderAll();
+                             showDialog({ title: 'Sucesso', message: "Backup restaurado com sucesso!" });
+                        }
+                    });
+                } catch(err) { showDialog({ title: 'Erro', message: "Arquivo inválido!" }); }
                 input.value = ''; 
             }
             reader.readAsText(file);
         }
 
         function resetFactory() {
-            if(confirm("ATENÇÃO: Isso apagará todos os produtos personalizados e configurações. Voltar ao padrão?")) {
-                localStorage.removeItem('saloon_ledger_v5');
-                location.reload();
-            }
+            showDialog({
+                type: 'confirm',
+                title: 'Cuidado!',
+                message: "ATENÇÃO: Isso apagará todos os produtos personalizados e configurações. Voltar ao padrão?",
+                onConfirm: () => {
+                     localStorage.removeItem('saloon_ledger_v5');
+                     location.reload();
+                }
+            });
         }
         
         function saveSettings() {
