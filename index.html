@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Garrison - Caixa Registradora</title>
+    <title>The Garrison - POS</title>
     
+    <!-- FAVICON: Caixa Registradora -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%238a0303%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><rect x=%222%22 y=%2213%22 width=%2220%22 height=%228%22 rx=%222%22/><path d=%22M4 13L6 5H18L20 13%22/><rect x=%228%22 y=%221%22 width=%228%22 height=%224%22 rx=%221%22/></svg>">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -87,6 +90,44 @@
         color: rgba(0, 0, 0, 0.5);
         font-weight: normal;
       }
+
+      /* Dropdown de Idioma */
+      .lang-dropdown {
+          display: none;
+          position: absolute;
+          top: 100%;
+          right: 0;
+          background-color: #d8cba8;
+          border: 2px solid #000;
+          border-radius: 4px;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+          z-index: 60;
+          flex-direction: column;
+          min-width: 140px;
+      }
+      .lang-dropdown.show { display: flex; }
+      .lang-option {
+          padding: 8px 12px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          cursor: pointer;
+          transition: background-color 0.2s;
+          color: #2b2b2b;
+          font-family: 'Special Elite', monospace;
+          font-weight: bold;
+      }
+      .lang-option:hover { background-color: #c4b694; }
+      
+      /* Ajuste da bandeira para evitar distorção e garantir formato retangular */
+      .lang-option svg, .lang-btn-icon svg { 
+          width: 30px; 
+          height: 20px; 
+          min-width: 30px; /* Garante que não é esmagada */
+          display: block;
+          border: 1px solid rgba(0,0,0,0.3);
+          box-shadow: 1px 1px 0 rgba(0,0,0,0.2); 
+      }
     </style>
 </head>
 <body class="font-sans pb-10 overflow-x-hidden flex flex-col min-h-screen">
@@ -109,14 +150,39 @@
                 </div>
                 <div>
                     <h1 id="headerStoreName" class="font-western text-3xl md:text-5xl tracking-widest drop-shadow-md">The Garrison</h1>
-                    <p class="font-typewriter text-xs text-white/70 tracking-widest uppercase hidden sm:block pl-1">Caixa Registradora</p>
+                    <p id="headerSubtitle" class="font-typewriter text-xs text-white/70 tracking-widest uppercase hidden sm:block pl-1">Caixa Registradora</p>
                 </div>
             </div>
             
             <div class="flex items-center gap-4">
                 <div class="text-right hidden md:block">
-                    <span class="text-xs font-western text-yellow-500/60 block">feito por Antônio Pimento</span>
+                    <span id="headerMadeBy" class="text-xs font-western text-yellow-500/60 block">feito por Antônio Pimento</span>
                 </div>
+                
+                <!-- Language Selector -->
+                <div class="relative">
+                    <button onclick="toggleLangMenu()" class="p-2 hover:bg-black/20 rounded border border-transparent hover:border-white/20 transition-colors flex items-center gap-2 lang-btn-icon" id="currentLangBtn" title="Mudar Idioma">
+                        <!-- Flag will be injected here -->
+                    </button>
+                    <div id="langDropdown" class="lang-dropdown">
+                        <div class="lang-option" onclick="setLanguage('pt-BR')">
+                            <!-- SVG Brazil -->
+                            <svg viewBox="0 0 72 50" preserveAspectRatio="xMidYMid slice"><rect width="72" height="50" fill="#009c3b"/><path d="M36,8 L68,25 L36,42 L4,25 Z" fill="#ffdf00"/><circle cx="36" cy="25" r="10" fill="#002776"/><path d="M28,27 A12,12 0 0,1 44,23" fill="none" stroke="#fff" stroke-width="1.5"/></svg>
+                            <span>Português</span>
+                        </div>
+                        <div class="lang-option" onclick="setLanguage('pt-PT')">
+                            <!-- SVG Portugal -->
+                            <svg viewBox="0 0 72 50" preserveAspectRatio="xMidYMid slice"><rect width="28" height="50" fill="#006600"/><rect x="28" width="44" height="50" fill="#ff0000"/><circle cx="28" cy="25" r="8" fill="#ffcc00"/><path d="M24,25 L32,25 M28,21 L28,29" stroke="#fff" stroke-width="2" /><path d="M28,22 Q32,22 32,25 Q32,28 28,28 Q24,28 24,25 Q24,22 28,22" fill="none" stroke="#006600" stroke-width="0.5" /></svg>
+                            <span>Português da Guiana</span>
+                        </div>
+                        <div class="lang-option" onclick="setLanguage('en-US')">
+                            <!-- SVG USA -->
+                            <svg viewBox="0 0 72 50" preserveAspectRatio="xMidYMid slice"><rect width="72" height="50" fill="#b22234"/><rect width="72" height="3.8" y="3.8" fill="#fff"/><rect width="72" height="3.8" y="11.4" fill="#fff"/><rect width="72" height="3.8" y="19" fill="#fff"/><rect width="72" height="3.8" y="26.6" fill="#fff"/><rect width="72" height="3.8" y="34.2" fill="#fff"/><rect width="72" height="3.8" y="41.8" fill="#fff"/><rect width="28" height="26" fill="#3c3b6e"/></svg>
+                            <span>English</span>
+                        </div>
+                    </div>
+                </div>
+
                 <button onclick="toggleSettings()" class="p-2 hover:bg-black/20 rounded-full transition-colors group">
                     <i data-lucide="settings" class="w-8 h-8 text-white group-hover:rotate-90 transition-transform duration-500"></i>
                 </button>
@@ -130,7 +196,7 @@
             <div class="overflow-y-auto custom-scrollbar pr-2 flex-grow min-h-[400px]" id="productsGrid">
                 <div class="text-center py-20 opacity-30">
                     <i data-lucide="loader-2" class="w-10 h-10 animate-spin mx-auto mb-4"></i>
-                    <p class="font-western">Carregando suprimentos...</p>
+                    <p id="loadingText" class="font-western">Carregando suprimentos...</p>
                 </div>
             </div>
 
@@ -139,7 +205,7 @@
                     <div class="p-1 rounded-full bg-rdr-paperDark border border-rdr-ink/20">
                          <i data-lucide="hand-coins" class="w-4 h-4 text-rdr-ink"></i>
                     </div>
-                    <h3 class="font-western text-lg text-rdr-ink tracking-wide">Gorjeta / Serviço</h3>
+                    <h3 id="tipServiceTitle" class="font-western text-lg text-rdr-ink tracking-wide">Gorjeta / Serviço</h3>
                 </div>
                 
                 <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
@@ -150,10 +216,10 @@
                          </div>
                          <input type="number" id="fixedTipInput" placeholder="Valor Fixo" oninput="setFixedTip(this.value)" 
                          class="w-full bg-rdr-paperDark/20 border-b-2 border-rdr-ink/30 pl-8 pr-2 py-1 font-typewriter font-bold focus:outline-none focus:border-rdr-red focus:bg-rdr-paperDark/40 transition-colors">
-                         <span class="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-western text-rdr-ink/50 pointer-events-none">Extra</span>
+                         <span id="extraLabel" class="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-western text-rdr-ink/50 pointer-events-none">Extra</span>
                     </div>
                 </div>
-                <p class="text-center text-xs font-typewriter text-rdr-ink/40 mt-2 italic">"A gratidão é a memória do coração."</p>
+                <p id="quoteCta" class="text-center text-xs font-typewriter text-rdr-ink/40 mt-2 italic">"A gratidão é a memória do coração."</p>
             </div>
         </div>
 
@@ -164,7 +230,7 @@
                     <img src="" class="w-3/4 object-contain grayscale sepia mix-blend-multiply filter blur-[0.5px]">
                 </div>
 
-                <div class="relative z-10 flex flex-col h-full">
+                <div class="relative z-10 flex flex-col flex-1">
                     <div class="text-center border-b-2 border-rdr-ink pb-4 mb-4">
                         <div class="flex items-center justify-center gap-4 mb-2">
                             <img id="receiptLogo" src="" class="h-16 w-auto max-w-[80px] object-contain grayscale sepia hidden contrast-125">
@@ -182,7 +248,7 @@
                     <div class="mt-auto border-t-2 border-dashed border-rdr-ink/50 pt-4 bg-rdr-paper/30 rounded-sm">
                         <div class="space-y-1 mb-4 px-2">
                             <div class="flex justify-between font-western text-lg text-rdr-ink/70">
-                                <span>PRODUTOS:</span>
+                                <span id="lblReceiptProducts">PRODUTOS:</span>
                                 <span id="subtotalDisplay" class="font-typewriter font-bold text-rdr-ink">$0.00</span>
                             </div>
                             <div class="flex justify-between font-western text-lg text-rdr-ink/70 items-center">
@@ -192,7 +258,7 @@
                         </div>
 
                         <div class="flex justify-between items-end font-western text-2xl text-rdr-ink pt-2 border-t border-rdr-ink px-2">
-                            <span>TOTAL:</span>
+                            <span id="lblReceiptTotal">TOTAL:</span>
                             <span id="totalDisplay" class="text-4xl font-typewriter font-bold text-rdr-red underline decoration-double decoration-rdr-ink/20">$0.00</span>
                         </div>
                         
@@ -202,11 +268,11 @@
                     </div>
 
                     <div class="grid grid-cols-3 gap-3 mt-4" data-html2canvas-ignore="true">
-                        <button onclick="clearCart()" class="col-span-1 border-2 border-rdr-ink text-rdr-ink hover:bg-rdr-ink/10 font-western text-sm py-3 uppercase tracking-wider transition-colors" title="Limpar Pedido">
+                        <button id="btnClearCart" onclick="clearCart()" class="col-span-1 border-2 border-rdr-ink text-rdr-ink hover:bg-rdr-ink/10 font-western text-sm py-3 uppercase tracking-wider transition-colors" title="Limpar Pedido">
                             Amassar
                         </button>
-                        <button onclick="downloadReceipt()" class="col-span-2 bg-rdr-ink text-rdr-paper border-2 border-black hover:bg-black font-western text-lg py-3 uppercase flex justify-center items-center gap-2 shadow-lg hover:scale-[1.02] transition-all">
-                            <i data-lucide="download" class="w-5 h-5"></i> Passar a Régua
+                        <button id="btnDownload" onclick="downloadReceipt()" class="col-span-2 bg-rdr-ink text-rdr-paper border-2 border-black hover:bg-black font-western text-lg py-3 uppercase flex justify-center items-center gap-2 shadow-lg hover:scale-[1.02] transition-all">
+                            <i data-lucide="download" class="w-5 h-5"></i> <span id="btnDownloadText">Passar a Régua</span>
                         </button>
                     </div>
                 </div>
@@ -219,7 +285,7 @@
         <div class="bg-rdr-paper w-full max-w-2xl h-[90vh] max-h-[800px] flex flex-col rounded shadow-2xl border-4 border-rdr-ink relative overflow-hidden transform scale-95 transition-transform" id="settingsModalContent">
             
             <div class="bg-rdr-red p-4 flex justify-between items-center text-white border-b-4 border-black shrink-0">
-                <h2 class="font-western text-2xl tracking-widest">CONFIGURAÇÕES</h2>
+                <h2 id="lblSettingsTitle" class="font-western text-2xl tracking-widest">CONFIGURAÇÕES</h2>
                 <button onclick="toggleSettings()" class="hover:text-yellow-400 transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
 
@@ -233,17 +299,17 @@
                 
                 <div id="content-general" class="space-y-8 relative z-10">
                     <div class="space-y-2">
-                        <label class="font-western text-xl text-rdr-ink">Nome do Estabelecimento</label>
+                        <label id="lblStoreName" class="font-western text-xl text-rdr-ink">Nome do Estabelecimento</label>
                         <input type="text" id="confStoreName" class="w-full input-readable rounded p-2 font-typewriter text-xl shadow-sm">
                     </div>
 
                     <div class="space-y-2">
-                        <label class="font-western text-xl text-rdr-ink">Endereço / Localização</label>
+                        <label id="lblAddress" class="font-western text-xl text-rdr-ink">Endereço / Localização</label>
                         <input type="text" id="confStoreAddress" placeholder="Ex: Saint Denis, Lemoyne" class="w-full input-readable rounded p-2 font-typewriter text-lg shadow-sm">
                     </div>
 
                     <div class="pt-4 border-t border-dashed border-rdr-ink/30">
-                        <label class="font-western text-xl text-rdr-ink mb-4 block">Brasão / Logo</label>
+                        <label id="lblLogo" class="font-western text-xl text-rdr-ink mb-4 block">Brasão / Logo</label>
                         <div class="flex flex-col sm:flex-row gap-6 items-start">
                             <div class="w-32 h-32 border-2 border-rdr-ink/30 bg-rdr-paperDark/20 flex items-center justify-center relative group rounded overflow-hidden shadow-inner">
                                 <img id="confLogoPreview" class="w-full h-full object-contain hidden">
@@ -258,17 +324,17 @@
                             <div class="flex-1 space-y-4">
                                 <input type="file" id="logoInput" accept="image/*" onchange="handleLogoUpload(this)" class="hidden">
                                 <button onclick="document.getElementById('logoInput').click()" class="bg-rdr-ink text-rdr-paper px-4 py-2 font-typewriter text-sm rounded hover:bg-black flex items-center gap-2 border border-black shadow-sm transition-transform active:scale-95">
-                                    <i data-lucide="upload" class="w-4 h-4"></i> Carregar Imagem
+                                    <i data-lucide="upload" class="w-4 h-4"></i> <span id="btnUploadText">Carregar Imagem</span>
                                 </button>
                                 
                                 <div class="space-y-2 pt-1">
                                     <label class="flex items-center gap-3 text-sm font-typewriter cursor-pointer select-none text-rdr-ink hover:text-rdr-red transition-colors">
                                         <input type="checkbox" id="confShowHeader" class="accent-rdr-red w-4 h-4"> 
-                                        <span>Exibir ao lado do nome (Cabeçalho)</span>
+                                        <span id="chkHeaderLabel">Exibir ao lado do nome (Cabeçalho)</span>
                                     </label>
                                     <label class="flex items-center gap-3 text-sm font-typewriter cursor-pointer select-none text-rdr-ink hover:text-rdr-red transition-colors">
                                         <input type="checkbox" id="confShowWatermark" class="accent-rdr-red w-4 h-4"> 
-                                        <span>Usar como Marca D'água (Fundo)</span>
+                                        <span id="chkWatermarkLabel">Usar como Marca D'água (Fundo)</span>
                                     </label>
                                 </div>
                             </div>
@@ -277,22 +343,22 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 pt-6 border-t border-rdr-ink/20">
                         <div class="dashed-box p-4 rounded bg-rdr-ink/5">
-                            <h3 class="font-western text-lg mb-3 text-rdr-ink">Arquivos do Escritório</h3>
+                            <h3 id="lblOfficeFiles" class="font-western text-lg mb-3 text-rdr-ink">Arquivos do Escritório</h3>
                             <div class="flex flex-col gap-3">
-                                <button onclick="importSettingsClick()" class="flex items-center gap-2 text-sm font-typewriter hover:text-rdr-red transition-colors group">
-                                    <i data-lucide="file-up" class="w-4 h-4 group-hover:-translate-y-0.5 transition-transform"></i> Importar Configurações
+                                <button onclick="importSettingsClick()" class="flex items-center gap-2 text-sm font-typewriter text-rdr-red font-bold hover:underline transition-colors group">
+                                    <i data-lucide="file-up" class="w-4 h-4 group-hover:-translate-y-0.5 transition-transform"></i> <span id="btnImportText">Importar Configurações</span>
                                 </button>
-                                <button onclick="exportSettings()" class="flex items-center gap-2 text-sm font-typewriter hover:text-rdr-red transition-colors group">
-                                    <i data-lucide="download" class="w-4 h-4 group-hover:translate-y-0.5 transition-transform"></i> Exportar Configurações
+                                <button onclick="exportSettings()" class="flex items-center gap-2 text-sm font-typewriter text-rdr-red font-bold hover:underline transition-colors group">
+                                    <i data-lucide="download" class="w-4 h-4 group-hover:translate-y-0.5 transition-transform"></i> <span id="btnExportText">Exportar Configurações</span>
                                 </button>
                                 <input type="file" id="importInput" accept=".json" class="hidden" onchange="importSettings(this)">
                             </div>
                         </div>
 
                         <div class="dashed-box p-4 rounded bg-rdr-ink/5 flex flex-col justify-between border-red-900/20">
-                             <h3 class="font-western text-lg mb-3 text-rdr-ink">Zona de Perigo</h3>
+                             <h3 id="lblDangerZone" class="font-western text-lg mb-3 text-rdr-ink">Zona de Perigo</h3>
                              <button onclick="resetFactory()" class="text-rdr-red font-typewriter text-sm font-bold flex items-center gap-2 hover:underline">
-                                <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Restaurar Padrões
+                                <i data-lucide="rotate-ccw" class="w-4 h-4"></i> <span id="btnResetText">Restaurar Padrões</span>
                              </button>
                         </div>
                     </div>
@@ -300,7 +366,7 @@
 
                 <div id="content-products" class="hidden space-y-8 relative z-10">
                     <div class="bg-rdr-paperDark/20 p-5 border border-rdr-ink/30 rounded shadow-inner space-y-5">
-                        <h3 class="font-western text-xl opacity-80">Adicionar Novo Item</h3>
+                        <h3 id="lblAddProduct" class="font-western text-xl opacity-80">Adicionar Novo Item</h3>
                         <div class="grid grid-cols-12 gap-3">
                             <div class="col-span-12 sm:col-span-5">
                                 <input type="text" id="newProdName" placeholder="Nome do Item" class="w-full input-readable rounded p-2 font-typewriter shadow-sm">
@@ -321,17 +387,17 @@
                         </div>
 
                         <div class="dashed-box p-3 rounded bg-rdr-paper/50">
-                            <label class="text-xs font-western opacity-60 uppercase mb-2 block tracking-widest">Escolha o Ícone</label>
+                            <label id="lblPickIcon" class="text-xs font-western opacity-60 uppercase mb-2 block tracking-widest">Escolha o Ícone</label>
                             <div class="flex flex-wrap gap-3" id="iconPickerGrid"></div>
                         </div>
 
                         <div class="dashed-box p-3 rounded bg-rdr-paper/50">
-                            <label class="text-xs font-western opacity-60 uppercase mb-2 block tracking-widest">Cor do Ícone</label>
+                            <label id="lblPickColor" class="text-xs font-western opacity-60 uppercase mb-2 block tracking-widest">Cor do Ícone</label>
                             <div class="flex gap-3 flex-wrap" id="colorPickerGrid"></div>
                         </div>
 
                         <button onclick="addProduct()" class="w-full bg-rdr-ink text-rdr-paper py-3 font-western uppercase rounded hover:bg-black transition-all flex items-center justify-center gap-2 text-lg shadow-md active:translate-y-0.5">
-                            <i data-lucide="plus"></i> Adicionar ao Catálogo
+                            <i data-lucide="plus"></i> <span id="btnAddCatalogText">Adicionar ao Catálogo</span>
                         </button>
                     </div>
 
@@ -340,9 +406,9 @@
             </div>
 
             <div class="p-4 bg-rdr-paper border-t-2 border-rdr-ink shrink-0 flex justify-end gap-3 z-20 relative">
-                 <button onclick="toggleSettings()" class="px-6 py-2 font-western text-rdr-ink border-2 border-transparent hover:border-rdr-ink/20 rounded transition-colors uppercase">Cancelar</button>
+                 <button id="btnCancel" onclick="toggleSettings()" class="px-6 py-2 font-western text-rdr-ink border-2 border-transparent hover:border-rdr-ink/20 rounded transition-colors uppercase">Cancelar</button>
                  <button onclick="saveSettings()" class="bg-rdr-ink text-rdr-paper px-8 py-2 font-western uppercase rounded shadow-lg hover:bg-black border-2 border-black flex items-center gap-2 hover:scale-105 transition-transform">
-                    <i data-lucide="save" class="w-4 h-4"></i> Salvar Alterações
+                    <i data-lucide="save" class="w-4 h-4"></i> <span id="btnSaveText">Salvar Alterações</span>
                  </button>
             </div>
         </div>
@@ -367,7 +433,193 @@
     <script>
         const ICONS_MAP = ['beer', 'glass-water', 'coffee', 'wine-off', 'utensils-crossed', 'drumstick', 'carrot', 'apple', 'fish', 'wheat', 'cigarette', 'shopping-bag', 'skull', 'star', 'heart', 'flame', 'shield', 'gem'];
         const COLORS_MAP = ['#2b2b2b', '#8a0303', '#d97706', '#ea580c', '#15803d', '#1d4ed8', '#78350f', '#6b7280'];
-        const QUOTES = [
+        
+        // FLAGS SVG DATA - UPDATED WITH PRESERVE ASPECT RATIO AND SLICE
+        const FLAG_SVGS = {
+            'pt-BR': '<svg viewBox="0 0 72 50" preserveAspectRatio="xMidYMid slice" class="w-8 h-6 border border-black/30"><rect width="72" height="50" fill="#009c3b"/><path d="M36,8 L68,25 L36,42 L4,25 Z" fill="#ffdf00"/><circle cx="36" cy="25" r="10" fill="#002776"/><path d="M28,27 A12,12 0 0,1 44,23" fill="none" stroke="#fff" stroke-width="1.5"/></svg>',
+            'pt-PT': '<svg viewBox="0 0 72 50" preserveAspectRatio="xMidYMid slice" class="w-8 h-6 border border-black/30"><rect width="28" height="50" fill="#006600"/><rect x="28" width="44" height="50" fill="#ff0000"/><circle cx="28" cy="25" r="8" fill="#ffcc00"/><path d="M24,25 L32,25 M28,21 L28,29" stroke="#fff" stroke-width="2" /><path d="M28,22 Q32,22 32,25 Q32,28 28,28 Q24,28 24,25 Q24,22 28,22" fill="none" stroke="#006600" stroke-width="0.5" /></svg>',
+            'en-US': '<svg viewBox="0 0 72 50" preserveAspectRatio="xMidYMid slice" class="w-8 h-6 border border-black/30"><rect width="72" height="50" fill="#b22234"/><rect width="72" height="3.8" y="3.8" fill="#fff"/><rect width="72" height="3.8" y="11.4" fill="#fff"/><rect width="72" height="3.8" y="19" fill="#fff"/><rect width="72" height="3.8" y="26.6" fill="#fff"/><rect width="72" height="3.8" y="34.2" fill="#fff"/><rect width="72" height="3.8" y="41.8" fill="#fff"/><rect width="28" height="26" fill="#3c3b6e"/></svg>'
+        };
+
+        // --- TRANSLATION SYSTEM ---
+        const TRANSLATIONS = {
+            'pt-BR': {
+                subtitle: "Caixa Registradora",
+                madeBy: "feito por Antônio Pimento",
+                loading: "Carregando suprimentos...",
+                tipService: "Gorjeta / Serviço",
+                extra: "Extra",
+                quoteCta: "A gratidão é a memória do coração.",
+                receiptEmpty: "Nenhum pedido anotado...",
+                products: "PRODUTOS",
+                tip: "GORJETA",
+                total: "TOTAL",
+                clearBtn: "Amassar",
+                checkoutBtn: "Passar a Régua",
+                settingsTitle: "CONFIGURAÇÕES",
+                tabStore: "LOJA & MARCA",
+                tabProducts: "PRODUTOS",
+                lblStoreName: "Nome do Estabelecimento",
+                lblAddress: "Endereço / Localização",
+                lblLogo: "Brasão / Logo",
+                btnUpload: "Carregar Imagem",
+                chkHeader: "Exibir ao lado do nome (Cabeçalho)",
+                chkWatermark: "Usar como Marca D'água (Fundo)",
+                officeFiles: "Arquivos do Escritório",
+                btnImport: "Importar Configurações",
+                btnExport: "Exportar Configurações",
+                dangerZone: "Zona de Perigo",
+                btnReset: "Restaurar Padrões",
+                addNewItem: "Adicionar Novo Item",
+                phName: "Nome do Item",
+                phPrice: "Preço",
+                lblPickIcon: "Escolha o Ícone",
+                lblPickColor: "Cor do Ícone",
+                btnAddCatalog: "Adicionar ao Catálogo",
+                btnCancel: "Cancelar",
+                btnSave: "Salvar Alterações",
+                catDrinks: "Bebidas",
+                catFood: "Comida",
+                catSupplies: "Suprimentos",
+                noProds: "Nenhum produto cadastrado.",
+                // Dialogs
+                attention: "ATENÇÃO",
+                confirm: "CONFIRMAÇÃO",
+                warning: "AVISO",
+                btnUnderstand: "Entendido",
+                btnCancelDialog: "Cancelar",
+                btnConfirm: "Confirmar",
+                errImage: "Erro ao gerar imagem: ",
+                errFill: "Preencha o nome e o preço corretamente.",
+                msgRemoveItem: "Remover este item do catálogo?",
+                titleRestore: "Restaurar Backup",
+                msgRestore: "Isso substituirá suas configurações atuais. Continuar?",
+                titleSuccess: "Sucesso",
+                msgSuccessRestore: "Backup restaurado com sucesso!",
+                titleCareful: "Cuidado!",
+                msgReset: "ATENÇÃO: Isso apagará todos os produtos personalizados e configurações. Voltar ao padrão?",
+                errFile: "Arquivo inválido!",
+                titleError: "Erro"
+            },
+            'pt-PT': {
+                subtitle: "Caixa Registadora",
+                madeBy: "feito por Antônio Pimento",
+                loading: "A carregar mantimentos...",
+                tipService: "Gratificação / Serviço",
+                extra: "Extra",
+                quoteCta: "A gratidão é a memória do coração.",
+                receiptEmpty: "Nenhum pedido registado...",
+                products: "ARTIGOS",
+                tip: "GRATIFICAÇÃO",
+                total: "TOTAL",
+                clearBtn: "Amachucar",
+                checkoutBtn: "Fechar a Conta",
+                settingsTitle: "DEFINIÇÕES",
+                tabStore: "LOJA & MARCA",
+                tabProducts: "ARTIGOS",
+                lblStoreName: "Nome do Estabelecimento",
+                lblAddress: "Morada / Localização",
+                lblLogo: "Brasão / Logótipo",
+                btnUpload: "Carregar Imagem",
+                chkHeader: "Mostrar ao lado do nome (Cabeçalho)",
+                chkWatermark: "Usar como Marca de Água (Fundo)",
+                officeFiles: "Ficheiros de Escritório",
+                btnImport: "Importar Definições",
+                btnExport: "Exportar Definições",
+                dangerZone: "Zona de Perigo",
+                btnReset: "Restaurar Predefinições",
+                addNewItem: "Adicionar Novo Artigo",
+                phName: "Nome do Artigo",
+                phPrice: "Preço",
+                lblPickIcon: "Escolha o Ícone",
+                lblPickColor: "Cor do Ícone",
+                btnAddCatalog: "Adicionar ao Catálogo",
+                btnCancel: "Cancelar",
+                btnSave: "Guardar Alterações",
+                catDrinks: "Bebidas",
+                catFood: "Comida",
+                catSupplies: "Mantimentos",
+                noProds: "Nenhum artigo registado.",
+                // Dialogs
+                attention: "ATENÇÃO",
+                confirm: "CONFIRMAÇÃO",
+                warning: "AVISO",
+                btnUnderstand: "Entendido",
+                btnCancelDialog: "Cancelar",
+                btnConfirm: "Confirmar",
+                errImage: "Erro ao gerar imagem: ",
+                errFill: "Preencha o nome e o preço corretamente.",
+                msgRemoveItem: "Remover este artigo do catálogo?",
+                titleRestore: "Restaurar Cópia",
+                msgRestore: "Isto irá substituir as suas definições atuais. Continuar?",
+                titleSuccess: "Sucesso",
+                msgSuccessRestore: "Cópia restaurada com sucesso!",
+                titleCareful: "Cuidado!",
+                msgReset: "ATENÇÃO: Isto apagará todos os artigos personalizados e definições. Voltar ao padrão?",
+                errFile: "Ficheiro inválido!",
+                titleError: "Erro"
+            },
+            'en-US': {
+                subtitle: "Cash Register",
+                madeBy: "made by Antônio Pimento",
+                loading: "Loading supplies...",
+                tipService: "Tip / Service",
+                extra: "Extra",
+                quoteCta: "Gratitude is the memory of the heart.",
+                receiptEmpty: "No orders taken...",
+                products: "PRODUCTS",
+                tip: "TIP",
+                total: "TOTAL",
+                clearBtn: "Crumple",
+                checkoutBtn: "Close Tab",
+                settingsTitle: "SETTINGS",
+                tabStore: "STORE & BRAND",
+                tabProducts: "PRODUCTS",
+                lblStoreName: "Establishment Name",
+                lblAddress: "Address / Location",
+                lblLogo: "Coat of Arms / Logo",
+                btnUpload: "Upload Image",
+                chkHeader: "Show beside name (Header)",
+                chkWatermark: "Use as Watermark (Background)",
+                officeFiles: "Office Files",
+                btnImport: "Import Settings",
+                btnExport: "Export Settings",
+                dangerZone: "Danger Zone",
+                btnReset: "Restore Defaults",
+                addNewItem: "Add New Item",
+                phName: "Item Name",
+                phPrice: "Price",
+                lblPickIcon: "Pick Icon",
+                lblPickColor: "Icon Color",
+                btnAddCatalog: "Add to Catalog",
+                btnCancel: "Cancel",
+                btnSave: "Save Changes",
+                catDrinks: "Drinks",
+                catFood: "Food",
+                catSupplies: "Supplies",
+                noProds: "No products registered.",
+                // Dialogs
+                attention: "ATTENTION",
+                confirm: "CONFIRMATION",
+                warning: "WARNING",
+                btnUnderstand: "Understood",
+                btnCancelDialog: "Cancel",
+                btnConfirm: "Confirm",
+                errImage: "Error generating image: ",
+                errFill: "Please fill in name and price correctly.",
+                msgRemoveItem: "Remove this item from catalog?",
+                titleRestore: "Restore Backup",
+                msgRestore: "This will override current settings. Continue?",
+                titleSuccess: "Success",
+                msgSuccessRestore: "Backup restored successfully!",
+                titleCareful: "Careful!",
+                msgReset: "WARNING: This will delete all custom products and settings. Reset to default?",
+                errFile: "Invalid file!",
+                titleError: "Error"
+            }
+        };
+
+        const QUOTES_PT = [
             "Se a vida te der limões, faça uma caipirinha.",
             "Teu galeto prefere o nosso espeto.",
             "Se você bebe para esquecer... por favor pague antes.",
@@ -376,6 +628,23 @@
             "Se ver que vai cair, se atira.",
             "Não toque Jaw Harp, obrigado."
         ];
+
+        const QUOTES_EN = [
+            "If life gives you lemons, make a Caipirinha.",
+            "You drink to forget... please pay before you do.",
+            "Peace comes after the third shot.",
+            "If you promised 'just one', don't promise again.",
+            "If you see you're gonna fall, dive.",
+            "No Jaw Harp playing allowed.",
+            "We don't serve rats... mostly."
+        ];
+
+        // Maps category keys to display names in both languages
+        const CAT_DISPLAY_MAP = {
+            'Bebidas': { 'pt-BR': 'Bebidas', 'pt-PT': 'Bebidas', 'en-US': 'Drinks' },
+            'Comida': { 'pt-BR': 'Comida', 'pt-PT': 'Comida', 'en-US': 'Food' },
+            'Suprimentos': { 'pt-BR': 'Suprimentos', 'pt-PT': 'Mantimentos', 'en-US': 'Supplies' }
+        };
 
         const DEFAULT_STORE_NAME = "The Garrison";
         const DEFAULT_STORE_ADDRESS = "Saint Denis, Lemoyne";
@@ -398,11 +667,17 @@
             showHeader: false,
             showWatermark: false,
             tipMode: 'percent', 
-            tipValue: 0
+            tipValue: 0,
+            language: 'pt-BR' // Default lang
         };
 
         let tempIcon = 'utensils-crossed';
         let tempColor = '#2b2b2b';
+
+        // Helper to translate
+        function t(key) {
+            return TRANSLATIONS[state.language][key] || key;
+        }
 
         // --- Generic Dialog Logic ---
         function showDialog({ title, message, type = 'alert', onConfirm }) {
@@ -412,20 +687,20 @@
             const msgEl = document.getElementById('genericModalMessage');
             const btnContainer = document.getElementById('genericModalButtons');
 
-            titleEl.innerText = title || (type === 'confirm' ? 'CONFIRMAÇÃO' : 'AVISO');
+            titleEl.innerText = title || (type === 'confirm' ? t('confirm') : t('warning'));
             msgEl.innerText = message;
             btnContainer.innerHTML = '';
 
             if (type === 'confirm') {
                 const cancelBtn = document.createElement('button');
                 cancelBtn.className = "px-4 py-2 font-western text-rdr-ink border-2 border-transparent hover:border-rdr-ink/20 rounded transition-colors uppercase";
-                cancelBtn.innerText = "Cancelar";
+                cancelBtn.innerText = t('btnCancelDialog');
                 cancelBtn.onclick = closeGenericModal;
                 btnContainer.appendChild(cancelBtn);
 
                 const confirmBtn = document.createElement('button');
                 confirmBtn.className = "bg-rdr-ink text-rdr-paper px-6 py-2 font-western uppercase rounded shadow-lg hover:bg-black border-2 border-black transition-transform hover:scale-105";
-                confirmBtn.innerText = "Confirmar";
+                confirmBtn.innerText = t('btnConfirm');
                 confirmBtn.onclick = () => {
                     if (onConfirm) onConfirm();
                     closeGenericModal();
@@ -434,7 +709,7 @@
             } else {
                 const okBtn = document.createElement('button');
                 okBtn.className = "bg-rdr-ink text-rdr-paper px-6 py-2 font-western uppercase rounded shadow-lg hover:bg-black border-2 border-black transition-transform hover:scale-105";
-                okBtn.innerText = "Entendido";
+                okBtn.innerText = t('btnUnderstand');
                 okBtn.onclick = closeGenericModal;
                 btnContainer.appendChild(okBtn);
             }
@@ -468,18 +743,122 @@
                     const parsed = JSON.parse(saved);
                     state = { ...state, ...parsed };
                     if(!state.storeAddress) state.storeAddress = DEFAULT_STORE_ADDRESS;
+                    // Backward compatibility for old lang format 'pt' or 'en'
+                    if(state.language === 'pt') state.language = 'pt-BR';
+                    if(state.language === 'en') state.language = 'en-US';
+                    if(!['pt-BR', 'pt-PT', 'en-US'].includes(state.language)) state.language = 'pt-BR';
+
                 } catch(e) { console.error("Save corrupted", e); }
             }
 
-            // REMOVED DATE FROM HERE
             document.getElementById('receiptAddressDate').innerText = state.storeAddress;
-            document.getElementById('quoteDisplay').innerText = QUOTES[Math.floor(Math.random() * QUOTES.length)];
-
+            updateQuote();
             setupPickers();
             renderAll();
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                const dropdown = document.getElementById('langDropdown');
+                const btn = document.getElementById('currentLangBtn');
+                if (!btn.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.remove('show');
+                }
+            });
+        }
+
+        function updateQuote() {
+            const quotes = state.language === 'en-US' ? QUOTES_EN : QUOTES_PT;
+            document.getElementById('quoteDisplay').innerText = quotes[Math.floor(Math.random() * quotes.length)];
+        }
+
+        function toggleLangMenu() {
+            const dropdown = document.getElementById('langDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        function setLanguage(lang) {
+            state.language = lang;
+            document.getElementById('langDropdown').classList.remove('show');
+            saveState();
+            renderAll();
+            updateQuote();
+        }
+
+        // Safe helpers to prevent crash if element doesn't exist
+        function safeSetText(id, text) {
+            const el = document.getElementById(id);
+            if (el) el.innerText = text;
+        }
+        
+        function safeSetPlaceholder(id, text) {
+            const el = document.getElementById(id);
+            if (el) el.placeholder = text;
+        }
+
+        function updateStaticTexts() {
+            // Update current flag in header
+            const btn = document.getElementById('currentLangBtn');
+            btn.innerHTML = FLAG_SVGS[state.language];
+
+            // Header
+            safeSetText('headerSubtitle', t('subtitle'));
+            safeSetText('headerMadeBy', t('madeBy'));
+            
+            // Main
+            safeSetText('loadingText', t('loading'));
+            safeSetText('tipServiceTitle', t('tipService'));
+            safeSetText('extraLabel', t('extra'));
+            safeSetText('quoteCta', `"${t('quoteCta')}"`);
+
+            // Receipt
+            safeSetText('lblReceiptProducts', t('products') + ":");
+            safeSetText('lblReceiptTotal', t('total') + ":");
+            safeSetText('btnClearCart', t('clearBtn'));
+            safeSetText('btnDownloadText', t('checkoutBtn'));
+
+            // Settings Modal
+            safeSetText('lblSettingsTitle', t('settingsTitle'));
+            safeSetText('tab-general', t('tabStore'));
+            safeSetText('tab-products', t('tabProducts') + ` (${state.products.length})`);
+            
+            safeSetText('lblStoreName', t('lblStoreName'));
+            safeSetText('lblAddress', t('lblAddress'));
+            safeSetText('lblLogo', t('lblLogo'));
+            safeSetText('btnUploadText', t('btnUpload'));
+            safeSetText('chkHeaderLabel', t('chkHeader'));
+            safeSetText('chkWatermarkLabel', t('chkWatermark'));
+            
+            safeSetText('lblOfficeFiles', t('officeFiles'));
+            safeSetText('btnImportText', t('btnImport'));
+            safeSetText('btnExportText', t('btnExport'));
+            safeSetText('lblDangerZone', t('dangerZone'));
+            safeSetText('btnResetText', t('btnReset'));
+            
+            safeSetText('lblAddProduct', t('addNewItem'));
+            safeSetPlaceholder('newProdName', t('phName'));
+            safeSetPlaceholder('newProdPrice', t('phPrice'));
+            safeSetText('lblPickIcon', t('lblPickIcon'));
+            safeSetText('lblPickColor', t('lblPickColor'));
+            safeSetText('btnAddCatalogText', t('btnAddCatalog'));
+            
+            safeSetText('btnCancel', t('btnCancel'));
+            safeSetText('btnSaveText', t('btnSave'));
+
+            // Select Options
+            const catSelect = document.getElementById('newProdCat');
+            if(catSelect) {
+                const currentCat = catSelect.value;
+                catSelect.innerHTML = `
+                    <option value="Bebidas">${t('catDrinks')}</option>
+                    <option value="Comida">${t('catFood')}</option>
+                    <option value="Suprimentos">${t('catSupplies')}</option>
+                `;
+                catSelect.value = currentCat;
+            }
         }
 
         function renderAll() {
+            updateStaticTexts();
             renderHeader();
             renderProducts();
             renderTipControls();
@@ -497,16 +876,15 @@
                 logoContainer.innerHTML = `<img src="${state.logo}" class="w-full h-full object-cover grayscale sepia contrast-125">`;
                 logoContainer.classList.remove('hidden');
             } else {
-                // Replaced fallback icon with SVG saloon doors here too
                 logoContainer.innerHTML = `
-                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-9 h-9 text-yellow-500/90">
-                      <path d="M3 7h8v10H3z" />
-                      <path d="M13 7h8v10h-8z" />
-                      <path d="M5 10h4" />
-                      <path d="M5 14h4" />
-                      <path d="M15 10h4" />
-                      <path d="M15 14h4" />
-                   </svg>`;
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-9 h-9 text-yellow-500/90">
+                       <path d="M3 7h8v10H3z" />
+                       <path d="M13 7h8v10h-8z" />
+                       <path d="M5 10h4" />
+                       <path d="M5 14h4" />
+                       <path d="M15 10h4" />
+                       <path d="M15 14h4" />
+                    </svg>`;
             }
         }
 
@@ -514,16 +892,23 @@
             const grid = document.getElementById('productsGrid');
             grid.innerHTML = '';
             
-            const categories = ['Bebidas', 'Comida', 'Suprimentos'];
+            // Categories are used as IDs for grouping
+            const categoryKeys = ['Bebidas', 'Comida', 'Suprimentos'];
             const iconsMap = { 'Bebidas': 'beer', 'Comida': 'utensils-crossed', 'Suprimentos': 'cigarette' };
 
-            categories.forEach(cat => {
-                const prods = state.products.filter(p => p.category === cat);
+            categoryKeys.forEach(catKey => {
+                const prods = state.products.filter(p => p.category === catKey);
                 if (prods.length === 0) return;
+
+                // Determine display name
+                let displayName = catKey;
+                if(CAT_DISPLAY_MAP[catKey]) {
+                    displayName = CAT_DISPLAY_MAP[catKey][state.language];
+                }
 
                 const catHeader = document.createElement('h3');
                 catHeader.className = "font-western text-xl text-rdr-paper/60 border-b-2 border-rdr-paper/10 mb-4 mt-6 pb-1 uppercase tracking-widest flex items-center gap-2 select-none";
-                catHeader.innerHTML = `<i data-lucide="${iconsMap[cat] || 'package'}" class="w-5 h-5"></i> ${cat}`;
+                catHeader.innerHTML = `<i data-lucide="${iconsMap[catKey] || 'package'}" class="w-5 h-5"></i> ${displayName}`;
                 grid.appendChild(catHeader);
 
                 const divGrid = document.createElement('div');
@@ -580,6 +965,7 @@
             });
 
             const fixedInput = document.getElementById('fixedTipInput');
+            fixedInput.placeholder = t('phPrice');
             if (state.tipMode === 'fixed') {
                 fixedInput.value = state.tipValue > 0 ? state.tipValue : '';
                 fixedInput.classList.add('border-rdr-red', 'bg-rdr-paperDark/40');
@@ -605,7 +991,6 @@
             const container = document.getElementById('cartItems');
 
             document.getElementById('receiptStoreTitle').innerText = state.storeName;
-            // REMOVED DATE FROM HERE TOO
             document.getElementById('receiptAddressDate').innerText = state.storeAddress;
             
             const receiptLogo = document.getElementById('receiptLogo');
@@ -643,13 +1028,13 @@
             html += '</tbody></table>';
 
             if (!hasItems) {
-                container.innerHTML = `<div class="flex flex-col items-center justify-center h-40 text-rdr-ink/40 italic"><i data-lucide="scroll" class="w-8 h-8 mb-2 opacity-50"></i><span>Nenhum pedido anotado...</span></div>`;
+                container.innerHTML = `<div class="flex flex-col items-center justify-center h-40 text-rdr-ink/40 italic"><i data-lucide="scroll" class="w-8 h-8 mb-2 opacity-50"></i><span>${t('receiptEmpty')}</span></div>`;
             } else {
                 container.innerHTML = html;
             }
 
             let tipAmount = state.tipMode === 'percent' ? subtotal * (state.tipValue / 100) : state.tipValue;
-            tipLabelEl.innerText = state.tipMode === 'percent' ? `GORJETA (${state.tipValue}%):` : 'GORJETA (EXTRA):';
+            tipLabelEl.innerText = state.tipMode === 'percent' ? `${t('tip')} (${state.tipValue}%):` : `${t('tip')} (${t('extra')}):`;
             const finalTotal = subtotal + tipAmount;
 
             subtotalEl.innerText = `$${subtotal.toFixed(2)}`;
@@ -689,7 +1074,7 @@
                 link.download = `${safeName}_recibo_${Date.now()}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
-            }).catch(err => showDialog({ title: 'Erro', message: "Erro ao gerar imagem: " + err }));
+            }).catch(err => showDialog({ title: t('titleError'), message: t('errImage') + err }));
         }
 
         function saveState() {
@@ -712,7 +1097,7 @@
                 document.getElementById('confStoreAddress').value = state.storeAddress;
                 document.getElementById('confShowHeader').checked = state.showHeader;
                 document.getElementById('confShowWatermark').checked = state.showWatermark;
-                document.getElementById('prodCount').innerText = state.products.length;
+                // document.getElementById('prodCount').innerText = state.products.length; // Already handled in updateStaticTexts
                 if(state.logo) {
                     document.getElementById('confLogoPreview').src = state.logo;
                     document.getElementById('confLogoPreview').classList.remove('hidden');
@@ -801,11 +1186,11 @@
                 state.products.push({ id: `custom_${Date.now()}`, name, price, category: cat, icon: tempIcon, color: tempColor });
                 document.getElementById('newProdName').value = '';
                 document.getElementById('newProdPrice').value = '';
-                document.getElementById('prodCount').innerText = state.products.length;
+                // document.getElementById('prodCount').innerText = state.products.length; // handled in renderAll->updateStaticTexts
                 renderConfProductList();
                 renderAll(); 
             } else {
-                showDialog({ title: 'Erro', message: "Preencha o nome e o preço corretamente." });
+                showDialog({ title: t('titleError'), message: t('errFill') });
             }
         }
 
@@ -813,16 +1198,20 @@
             const list = document.getElementById('confProductList');
             list.innerHTML = '';
             if (state.products.length === 0) {
-                list.innerHTML = '<p class="text-center text-rdr-ink/50 py-4 font-typewriter">Nenhum produto cadastrado.</p>';
+                list.innerHTML = `<p class="text-center text-rdr-ink/50 py-4 font-typewriter">${t('noProds')}</p>`;
                 return;
             }
 
             state.products.forEach((p, index) => {
+                // translate cat name for list
+                let catDisplay = p.category;
+                if (CAT_DISPLAY_MAP[p.category]) catDisplay = CAT_DISPLAY_MAP[p.category][state.language];
+
                 const item = document.createElement('div');
                 item.className = "flex items-center gap-3 p-3 bg-white/40 rounded border border-rdr-ink/10 hover:bg-white/60 transition-colors";
                 item.innerHTML = `
                     <div class="p-2 rounded-full bg-rdr-paperDark border border-rdr-ink/10"><i data-lucide="${p.icon || 'package'}" style="color:${p.color || '#000'}" class="w-4 h-4"></i></div>
-                    <div class="flex-1 font-typewriter"><div class="font-bold text-black">${p.name}</div><div class="text-xs opacity-60 uppercase">${p.category}</div></div>
+                    <div class="flex-1 font-typewriter"><div class="font-bold text-black">${p.name}</div><div class="text-xs opacity-60 uppercase">${catDisplay}</div></div>
                     <div class="font-bold text-rdr-red font-typewriter text-lg">$${p.price.toFixed(2)}</div>
                     <button onclick="removeProduct(${index})" class="p-2 text-rdr-ink/40 hover:text-rdr-red hover:bg-red-100 rounded transition-colors" title="Excluir"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                 `;
@@ -834,15 +1223,14 @@
         function removeProduct(index) {
             showDialog({
                 type: 'confirm',
-                title: 'Remover Item',
-                message: 'Remover este item do catálogo?',
+                title: t('attention'),
+                message: t('msgRemoveItem'),
                 onConfirm: () => {
-                     const prodId = state.products[index].id;
-                     state.products.splice(index, 1);
-                     if(state.cart[prodId]) delete state.cart[prodId];
-                     document.getElementById('prodCount').innerText = state.products.length;
-                     renderConfProductList();
-                     renderAll();
+                      const prodId = state.products[index].id;
+                      state.products.splice(index, 1);
+                      if(state.cart[prodId]) delete state.cart[prodId];
+                      renderConfProductList();
+                      renderAll();
                 }
             });
         }
@@ -891,17 +1279,17 @@
                     const data = JSON.parse(e.target.result);
                     showDialog({
                         type: 'confirm',
-                        title: 'Restaurar Backup',
-                        message: "Isso substituirá suas configurações atuais. Continuar?",
+                        title: t('titleRestore'),
+                        message: t('msgRestore'),
                         onConfirm: () => {
                              state = { ...state, ...data };
                              saveState();
                              toggleSettings();
                              renderAll();
-                             showDialog({ title: 'Sucesso', message: "Backup restaurado com sucesso!" });
+                             showDialog({ title: t('titleSuccess'), message: t('msgSuccessRestore') });
                         }
                     });
-                } catch(err) { showDialog({ title: 'Erro', message: "Arquivo inválido!" }); }
+                } catch(err) { showDialog({ title: t('titleError'), message: t('errFile') }); }
                 input.value = ''; 
             }
             reader.readAsText(file);
@@ -910,11 +1298,11 @@
         function resetFactory() {
             showDialog({
                 type: 'confirm',
-                title: 'Cuidado!',
-                message: "ATENÇÃO: Isso apagará todos os produtos personalizados e configurações. Voltar ao padrão?",
+                title: t('titleCareful'),
+                message: t('msgReset'),
                 onConfirm: () => {
-                     localStorage.removeItem('saloon_ledger_v5');
-                     location.reload();
+                      localStorage.removeItem('saloon_ledger_v5');
+                      location.reload();
                 }
             });
         }
